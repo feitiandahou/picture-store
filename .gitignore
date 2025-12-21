@@ -1,0 +1,29 @@
+# 通用忽略项
+.DS_Store
+*.log
+.env
+.env.local
+
+# 前端 - Vue / Node.js
+node_modules/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 后端 - Spring Boot (Maven)
+target/
+
+# 如果你用 Gradle，请取消下面这行的注释
+# build/
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 系统
+Thumbs.db
+Desktop.ini
+EOF
