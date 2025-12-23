@@ -1,5 +1,6 @@
 package org.example.picturestorebackend.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -24,6 +25,10 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
 * @author 17403
@@ -48,7 +53,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         String url = picture.getUrl();
         String introduction = picture.getIntroduction();
         //修改数据时, id不能为空， 有参数则校验
-        ThrowUtils.throwIf(ObjUtil.isNotNull(id), ErrorCode.PARAMS_ERROR, "id 不能为空");
+        ThrowUtils.throwIf(ObjUtil.isNull(id), ErrorCode.PARAMS_ERROR, "id 不能为空");
         //如果传递了url, 才校验
         if(StrUtil.isNotBlank(url)) {
             ThrowUtils.throwIf(url.length() > 1024, ErrorCode.PARAMS_ERROR, "url过长");
@@ -114,14 +119,92 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         return pictureVO;
     }
 
+    /**
+     * 分页获取图片封装
+     * @param picturePage
+     * @param request
+     * @return
+     */
     @Override
     public Page<PictureVO> getPcitureVOpage(Page<Picture> picturePage, HttpServletRequest request) {
-        return null;
+        List<Picture> pictureList = picturePage.getRecords();
+        Page<PictureVO> pictureVOPage = new Page<>(picturePage.getCurrent(), picturePage.getSize(), picturePage.getTotal());
+        if(CollUtil.isEmpty(pictureList)) {
+            return pictureVOPage;
+        }
+        //对象列表 -> 封装对象列表
+        List<PictureVO> pictureVOList = pictureList.stream()
+                .map(PictureVO::objToVo)
+                .collect(Collectors.toList());
+        //1.关联查询用户信息
+        //1,2,3,4
+        Set<Long> userIdSet = pictureList.stream().map(Picture::getUserId).collect(Collectors.toSet());
+        //1->user1 2-> user2
+        Map<Long, List<User>> userIdUserListMap = userService.listByIds(userIdSet).stream()
+                .collect(Collectors.groupingBy(User::getId));
+        //2.填充信息
+        pictureVOList.forEach(pictureVO -> {
+            Long userId = pictureVO.getUserId();
+            User user = null;
+            if(userIdUserListMap.containsKey(userId)) {
+                user = userIdUserListMap.get(userId).get(0);
+            }
+            pictureVO.setUser(userService.getUserVO(user));
+        });
+        pictureVOPage.setRecords(pictureVOList);
+        return pictureVOPage;
     }
+
 
     @Override
     public QueryWrapper<Picture> getQueryWrapper(PictureQueryRequest pictureQueryRequest) {
-        return null;
+        QueryWrapper<Picture> queryWrapper = new QueryWrapper<>();
+        if(pictureQueryRequest == null) {
+            return queryWrapper;
+        }
+        //从对象中取值
+        Long id = pictureQueryRequest.getId();
+        String name = pictureQueryRequest.getName();
+        String introduction = pictureQueryRequest.getIntroduction();
+        String category = pictureQueryRequest.getCategory();
+        List<String> tags = pictureQueryRequest.getTags();
+        Long picSize = pictureQueryRequest.getPicSize();
+        Integer picWidth = pictureQueryRequest.getPicWidth();
+        Integer picHeight = pictureQueryRequest.getPicHeight();
+        Double picScale = pictureQueryRequest.getPicScale();
+        String picFormat = pictureQueryRequest.getPicFormat();
+        String searchText = pictureQueryRequest.getSearchText();
+        Long userId = pictureQueryRequest.getUserId();
+        String sortField = pictureQueryRequest.getSortField();
+        String sortOrder = pictureQueryRequest.getSortOrder();
+        //从多字段中搜索
+        if(StrUtil.isNotBlank(searchText)) {
+            //需要拼接查询条件
+            queryWrapper.and(qw -> qw.like("name", searchText)
+                    .or()
+                    .like("introduction", searchText)
+            );
+        }
+        queryWrapper.eq(ObjUtil.isNotEmpty(id), "id", id);
+        queryWrapper.eq(ObjUtil.isNotEmpty(userId), "userId", userId);
+        queryWrapper.like(StrUtil.isNotBlank(name), "name", name);
+        queryWrapper.like(StrUtil.isNotBlank(introduction), "introduction", introduction);
+        queryWrapper.like(StrUtil.isNotBlank(picFormat), "picFormat", picFormat);
+        queryWrapper.eq(StrUtil.isNotBlank(category), "category", category);
+        queryWrapper.eq(ObjUtil.isNotEmpty(picWidth), "picWidth", picWidth);
+        queryWrapper.eq(ObjUtil.isNotEmpty(picHeight), "picHeight", picHeight);
+        queryWrapper.eq(ObjUtil.isNotEmpty(picSize), "picSize", picSize);
+        queryWrapper.eq(ObjUtil.isNotEmpty(picScale), "picScale", picScale);
+        // JSON数组查询
+        if(CollUtil.isNotEmpty(tags)) {
+            /* and (tag like "%\"Java\"%" and like "%\"Python\"%" */
+            for (String tag: tags) {
+                queryWrapper.like("tags", "\"" + tag + "\"" );
+            }
+        }
+        //排序
+        queryWrapper.orderBy(StrUtil.isNotEmpty(sortField), sortOrder.equals("ascend"), sortField);
+        return queryWrapper;
     }
 }
 

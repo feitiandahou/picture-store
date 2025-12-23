@@ -5,8 +5,10 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.model.ciModel.image.ImageInfos;
+import com.qcloud.cos.model.ciModel.persistence.CIUploadResult;
 import com.qcloud.cos.model.ciModel.persistence.ImageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.example.picturestorebackend.config.CosClientConfig;
@@ -20,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.swing.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -51,9 +54,16 @@ public class FileManager {
             //上传文件
             file = File.createTempFile(uploadPath, null);
             multipartFile.transferTo(file);
-            PutObjectResult putObjectResult = cosManager.putObject(uploadPath, file);
+            PutObjectResult putObjectResult = cosManager.putPictureObject(uploadPath, file);
+
+            CIUploadResult ciUploadResult = putObjectResult.getCiUploadResult();
+            if(ciUploadResult == null){
+                // 无法获取 ImageInfo，需走其他方式（如自己解析图片元数据）
+                throw new BusinessException(ErrorCode.SYSTEM_ERROR,
+                        "上传失败，请确认是系统是否启用了数据万象（Cloud Infinite）功能");
+            }
             //获取图片信息对象
-            ImageInfo imageInfo = putObjectResult.getCiUploadResult().getOriginalInfo().getImageInfo();
+            ImageInfo imageInfo = ciUploadResult.getOriginalInfo().getImageInfo();
             //计算宽高
             int picWidth = imageInfo.getWidth();
             int picHeight = imageInfo.getHeight();
@@ -70,8 +80,8 @@ public class FileManager {
             //返回可访问的地址
             return uploadPictureResult;
 
-        }catch (Exception e){
-            log.error("图片上传到对象存储失败", e);
+        }catch (IOException e){
+            log.error("文件读写或上传COS失败", e);
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "上传失败");
         }finally {
             //临时文件清理
