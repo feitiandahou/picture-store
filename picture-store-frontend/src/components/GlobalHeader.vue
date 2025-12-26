@@ -61,9 +61,19 @@ const originaItems = [
     title: '主页',
   },
   {
+    key: '/add_picture',
+    label: '添加图片',
+    title: '添加图片',
+  },
+  {
     key: '/admin/userManage',
     label: '用户管理',
     title: '用户管理',
+  },
+  {
+    key: '/admin/pictureManage',
+    label: '图片管理',
+    title: '图片管理',
   },
 ]
 //根据权限过滤菜单项
