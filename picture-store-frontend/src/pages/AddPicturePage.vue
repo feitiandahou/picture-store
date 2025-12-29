@@ -4,7 +4,16 @@
       {{ route.query?.id ? '修改图片' : '创建图片' }}
     </h2>
     <!-- 图片上传组件 -->
-    <PictureUpload :picture="picture" :onSuccess="onSuccess" />
+
+    <!-- 选择上传方式-->
+    <a-tabs v-model:activeKey="uploadType">
+      <a-tab-pane key="file" tab="文件上传">
+        <PictureUpload :picture="picture" :onSuccess="onSuccess" />
+      </a-tab-pane>
+      <a-tab-pane key="url" tab="URL上传">
+        <UrlPictureUpload :picture="picture" :onSuccess="onSuccess" />
+      </a-tab-pane>
+    </a-tabs>
     <!-- 图片信息表单 -->
     <a-form
       v-if="picture"
@@ -54,13 +63,15 @@ import { onMounted, reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
 import {
   editPictureUsingPost,
-  getPictureVOByIdUsingGet,
+  getPictureVoByIdUsingGet,
   listPictureTagCategoryUsingGet,
-} from '@/api/PictureController'
+} from '@/api/pictureController'
+import UrlPictureUpload from '@/components/UrlPictureUpload.vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const picture = ref<API.PictureVO>()
 const pictureForm = reactive<API.PictureEditRequest>({})
+const uploadType = ref<'file' | 'url'>('file')
 
 /**
  * 图片上传成功
@@ -129,7 +140,7 @@ const getOldPicture = async () => {
   //获取id
   const id = route.query?.id
   if (id) {
-    const res = await getPictureVOByIdUsingGet({ id })
+    const res = await getPictureVoByIdUsingGet({ id })
     if (res.data.code === 0 && res.data.data) {
       const data = res.data.data
       picture.value = data

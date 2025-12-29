@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { deleteUserUsingPost, listUserVOByPageUsingPost } from '@/api/userController'
+import { deleteUserUsingPost, listUserVoByPageUsingPost } from '@/api/userController'
 import { message } from 'ant-design-vue'
 import { onMounted, reactive, ref, computed } from 'vue'
 import dayjs from 'dayjs'
@@ -100,7 +100,7 @@ const fetchData = async () => {
   console.log('分页查询参数')
   console.log(searchParams)
 
-  const res = await listUserVOByPageUsingPost({
+  const res = await listUserVoByPageUsingPost({
     ...searchParams,
   })
   console.log('获取用户列表')

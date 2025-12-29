@@ -66,14 +66,11 @@
       </a-col>
     </a-row>
   </div>
-  <div>
-    <h1>图片详情</h1>
-  </div>
 </template>
 
 <script setup lang="ts">
 import { h, onMounted, ref, computed } from 'vue'
-import { deletePictureUsingPost, getPictureVOByIdUsingGet } from '@/api/PictureController'
+import { deletePictureUsingPost, getPictureVoByIdUsingGet } from '@/api/pictureController'
 import { message } from 'ant-design-vue'
 import { DeleteOutlined, EditOutlined, DownloadOutlined } from '@ant-design/icons-vue'
 import { useLoginUserStore } from '@/stores/userStore'
@@ -98,7 +95,7 @@ const canEdit = computed(() => {
 //获取图片详情
 const fetchPictureDetail = async () => {
   try {
-    const res = await getPictureVOByIdUsingGet({ id: props.id })
+    const res = await getPictureVoByIdUsingGet({ id: props.id })
     console.log('图片详情返回', res)
 
     if (res.data.code === 0 && res.data.data) {
@@ -128,6 +125,7 @@ const doDelete = async () => {
   const res = await deletePictureUsingPost({ id })
   if (res.data.code === 0) {
     message.success('删除成功')
+    router.push('/')
   } else {
     message.error('删除失败, ' + res.data.message)
   }
