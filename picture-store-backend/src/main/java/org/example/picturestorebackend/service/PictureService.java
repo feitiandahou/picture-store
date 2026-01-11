@@ -3,10 +3,7 @@ package org.example.picturestorebackend.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.example.picturestorebackend.model.dto.picture.PictureQueryRequest;
-import org.example.picturestorebackend.model.dto.picture.PictureReviewRequest;
-import org.example.picturestorebackend.model.dto.picture.PictureUploadByBatchRequest;
-import org.example.picturestorebackend.model.dto.picture.PictureUploadRequest;
+import org.example.picturestorebackend.model.dto.picture.*;
 import org.example.picturestorebackend.model.entity.Picture;
 import org.example.picturestorebackend.model.entity.User;
 import org.example.picturestorebackend.model.vo.PictureVO;
@@ -17,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 public interface PictureService extends IService<Picture> {
     /**
      * 校验图片
+     * @param picture
      */
     void validPicture(Picture picture);
 
@@ -80,4 +78,25 @@ public interface PictureService extends IService<Picture> {
      * @param oldPicture
      */
     void clearPictureFile(Picture oldPicture);
+
+    /**
+     * 删除图片
+     * @param pictureId
+     * @param loginUser
+     */
+    void deletePicture(long pictureId, User loginUser);
+
+    /**
+     * 编辑图片
+     * @param pictureEditRequest
+     * @param loginUser
+     */
+    void editPicture(PictureEditRequest pictureEditRequest, User loginUser);
+
+    /**
+     * 校验空间图片的权限
+     * @param loginUser
+     * @param picture
+     */
+    void checkPictureAuth(User loginUser, Picture picture);
 }
