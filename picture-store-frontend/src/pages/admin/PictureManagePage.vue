@@ -190,6 +190,11 @@ const columns = [
     width: 80,
   },
   {
+    title: '空间id',
+    dataIndex: 'spaceId',
+    width: 80,
+  },
+  {
     title: '审核信息',
     dataIndex: 'reviewMessage',
   },
@@ -234,6 +239,7 @@ const fetchData = async () => {
 
   const res = await listPictureByPageUsingPost({
     ...searchParams,
+    nullSpaceId: true,
   })
   if (res.data.code === 0 && res.data.data) {
     console.log('获取数据成功:', res.data.data)

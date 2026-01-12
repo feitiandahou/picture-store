@@ -11,6 +11,12 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseListSpaceLevel_ = {
+    code?: number
+    data?: SpaceLevel[]
+    message?: string
+  }
+
   type BaseResponseLoginUserVO_ = {
     code?: number
     data?: LoginUserVO
@@ -32,6 +38,18 @@ declare namespace API {
   type BaseResponsePagePictureVO_ = {
     code?: number
     data?: PagePictureVO_
+    message?: string
+  }
+
+  type BaseResponsePageSpace_ = {
+    code?: number
+    data?: PageSpace_
+    message?: string
+  }
+
+  type BaseResponsePageSpaceVO_ = {
+    code?: number
+    data?: PageSpaceVO_
     message?: string
   }
 
@@ -59,6 +77,18 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseSpace_ = {
+    code?: number
+    data?: Space
+    message?: string
+  }
+
+  type BaseResponseSpaceVO_ = {
+    code?: number
+    data?: SpaceVO
+    message?: string
+  }
+
   type BaseResponseString_ = {
     code?: number
     data?: string
@@ -81,6 +111,16 @@ declare namespace API {
   }
 
   type getPictureVOByIdUsingGETParams = {
+    /** id */
+    id?: number
+  }
+
+  type getSpaceByIdUsingGETParams = {
+    /** id */
+    id?: number
+  }
+
+  type getSpaceVOByIdUsingGETParams = {
     /** id */
     id?: number
   }
@@ -118,6 +158,22 @@ declare namespace API {
     total?: number
   }
 
+  type PageSpace_ = {
+    current?: number
+    pages?: number
+    records?: Space[]
+    size?: number
+    total?: number
+  }
+
+  type PageSpaceVO_ = {
+    current?: number
+    pages?: number
+    records?: SpaceVO[]
+    size?: number
+    total?: number
+  }
+
   type PageUserVO_ = {
     current?: number
     pages?: number
@@ -143,6 +199,7 @@ declare namespace API {
     reviewStatus?: number
     reviewTime?: string
     reviewerId?: number
+    spaceId?: number
     tags?: string
     thumbnailUrl?: string
     updateTime?: string
@@ -164,6 +221,7 @@ declare namespace API {
     id?: number
     introduction?: string
     name?: string
+    nullSpaceId?: boolean
     pageSize?: number
     picFormat?: string
     picHeight?: number
@@ -177,6 +235,7 @@ declare namespace API {
     searchText?: string
     sortField?: string
     sortOrder?: string
+    spaceId?: number
     tags?: string[]
     userId?: number
   }
@@ -210,6 +269,7 @@ declare namespace API {
     fileUrl?: string
     id?: number
     picName?: string
+    spaceId?: number
   }
 
   type PictureVO = {
@@ -224,10 +284,77 @@ declare namespace API {
     picScale?: number
     picSize?: number
     picWidth?: number
+    spaceId?: number
     tags?: string[]
     thumbnailUrl?: string
     updateTime?: string
     url?: string
+    user?: UserVO
+    userId?: number
+  }
+
+  type Space = {
+    createTime?: string
+    editTime?: string
+    id?: number
+    isDelete?: number
+    maxCount?: number
+    maxSize?: number
+    spaceLevel?: number
+    spaceName?: string
+    totalCount?: number
+    totalSize?: number
+    updateTime?: string
+    userId?: number
+  }
+
+  type SpaceAddRequest = {
+    spaceLevel?: number
+    spaceName?: string
+  }
+
+  type SpaceEditRequest = {
+    id?: number
+    spaceName?: string
+  }
+
+  type SpaceLevel = {
+    maxCount?: number
+    maxSize?: number
+    text?: string
+    value?: number
+  }
+
+  type SpaceQueryRequest = {
+    current?: number
+    id?: number
+    pageSize?: number
+    sortField?: string
+    sortOrder?: string
+    spaceLevel?: number
+    spaceName?: string
+    userId?: number
+  }
+
+  type SpaceUpdateRequest = {
+    id?: number
+    maxCount?: number
+    maxSize?: number
+    spaceLevel?: number
+    spaceName?: string
+  }
+
+  type SpaceVO = {
+    createTime?: string
+    editTime?: string
+    id?: number
+    maxCount?: number
+    maxSize?: number
+    spaceLevel?: number
+    spaceName?: string
+    totalCount?: number
+    totalSize?: number
+    updateTime?: string
     user?: UserVO
     userId?: number
   }
@@ -241,6 +368,7 @@ declare namespace API {
     fileUrl?: string
     id?: number
     picName?: string
+    spaceId?: number
   }
 
   type UserAddRequest = {
