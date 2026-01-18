@@ -30,27 +30,31 @@
               </template>
             </a-card-meta>
             <template v-if="showOp" #actions>
-              <a-space @click="(e) => doEdit(picture, e)">
-                <EditOutlined />
-                编辑
-              </a-space>
-              <a-space @click="(e) => doDelete(picture, e)">
-                <DeleteOutlined />
-                删除
-              </a-space>
+              <ShareAltOutlined @click="(e) => doShare(picture, e)" />
+              <SearchOutlined @click="(e) => doSearch(picture, e)" />
+              <EditOutlined @click="(e) => doEdit(picture, e)" />
+              <DeleteOutlined @click="(e) => doDelete(picture, e)" />
             </template>
           </a-card>
         </a-list-item>
       </template>
     </a-list>
+    <ShareModal ref="shareModalRef" :link="shareLink" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons-vue'
+import {
+  DeleteOutlined,
+  EditOutlined,
+  ShareAltOutlined,
+  SearchOutlined,
+} from '@ant-design/icons-vue'
 import { deletePictureUsingPost } from '@/api/pictureController'
 import { message } from 'ant-design-vue'
+import ShareModal from './ShareModal.vue'
+import { ref } from 'vue'
 
 interface Props {
   dataList?: API.PictureVO[]
@@ -73,8 +77,28 @@ const doClickPicture = (picture: API.PictureVO) => {
   })
 }
 
+// 分享
+const shareModalRef = ref()
+const shareLink = ref<string>()
+const doShare = (picture, e) => {
+  // 阻止冒泡
+  e.stopPropagation()
+  // 打开分享弹窗
+  shareLink.value = `${window.location.protocol}//${window.location.host}/picture/${picture.id}`
+  if (shareModalRef.value) {
+    shareModalRef.value.openModal()
+  }
+}
+
+//搜索
+const doSearch = (picture, e) => {
+  //阻止冒泡
+  e.stopPropagation()
+  //打开新的页面
+  window.open(`/search_picture?pictureId=${picture.id}`)
+}
 // 编辑
-const doEdit = (picture, e) => {
+const doEdit = (picture: API.PictureVO, e) => {
   // 阻止冒泡
   e.stopPropagation()
   // 跳转时一定要携带 spaceId

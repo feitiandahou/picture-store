@@ -27,3 +27,16 @@ export function downloadImage(url?: string, fileName?: string) {
   link.click()
   document.body.removeChild(link)
 }
+
+export function toHexColor(input: string) {
+  console.log('input', input)
+
+  //去掉0x前缀
+  const colorValue = input.startsWith('0x') ? input.slice(2) : input
+  // 确保是6位十六进制
+  const hexColor = parseInt(colorValue, 16).toString(16).padStart(6, '0')
+  console.log('hexColor', hexColor)
+
+  //返回标准 #RRGGBB格式
+  return `#${hexColor}`
+}
