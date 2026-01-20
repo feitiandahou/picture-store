@@ -1,6 +1,7 @@
 package org.example.picturestorebackend.controller;
 
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.json.JSONUtil;
@@ -9,8 +10,11 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.extern.slf4j.Slf4j;
 import org.example.picturestorebackend.annotation.AuthCheck;
+import org.example.picturestorebackend.api.aliyunai.AliYunAiApi;
 import org.example.picturestorebackend.api.imagesearch.ImageSearchApiFacade;
 import org.example.picturestorebackend.api.imagesearch.model.ImageSearchResult;
+import org.example.picturestorebackend.api.model.CreateOutPaintingTaskResponse;
+import org.example.picturestorebackend.api.model.GetOutPaintingTaskResponse;
 import org.example.picturestorebackend.common.BaseResponse;
 import org.example.picturestorebackend.common.DeleteRequest;
 import org.example.picturestorebackend.common.ResultUtils;
@@ -59,6 +63,9 @@ public class PictureController {
 
     @Resource
     private SpaceService spaceService;
+
+    @Resource
+    private AliYunAiApi aliYunAiApi;
 
     /**
      * 本地缓存
@@ -382,6 +389,30 @@ public class PictureController {
         User loginUser = userService.getLoginUser(request);
         pictureService.editPictureByBatch(pictureEditByBatchRequest, loginUser);
         return ResultUtils.success(true);
+    }
+
+    /**
+     * 创建 AI 扩图任务
+     */
+    @PostMapping("/out_painting/create_task")
+    public BaseResponse<CreateOutPaintingTaskResponse> createPictureOutPaintingTask(@RequestBody CreatePictureOutPaintingTaskRequest createPictureOutPaintingTaskRequest,
+                                                                                    HttpServletRequest request) {
+        if (createPictureOutPaintingTaskRequest == null || createPictureOutPaintingTaskRequest.getPictureId() == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User loginUser = userService.getLoginUser(request);
+        CreateOutPaintingTaskResponse response = pictureService.createPictureOutPaintingTask(createPictureOutPaintingTaskRequest, loginUser);
+        return ResultUtils.success(response);
+    }
+
+    /**
+     * 查询 AI 扩图任务
+     */
+    @GetMapping("/out_painting/get_task")
+    public BaseResponse<GetOutPaintingTaskResponse> getPictureOutPaintingTask(String taskId) {
+        ThrowUtils.throwIf(StrUtil.isBlank(taskId), ErrorCode.PARAMS_ERROR);
+        GetOutPaintingTaskResponse task = aliYunAiApi.getOutPaintingTask(taskId);
+        return ResultUtils.success(task);
     }
 
 }

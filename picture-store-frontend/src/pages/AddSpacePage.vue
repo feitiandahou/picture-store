@@ -49,6 +49,7 @@ import {
 import { useRoute, useRouter } from 'vue-router'
 import { SPACE_LEVEL_OPTIONS } from '@/constants/space'
 import { formatSize } from '../utils'
+import TestCropper from '@/components/TestCropper.vue'
 
 const space = ref<API.SpaceVO>()
 const spaceForm = reactive<API.SpaceAddRequest | API.SpaceEditRequest>({})

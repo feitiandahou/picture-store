@@ -3,6 +3,8 @@ package org.example.picturestorebackend.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.example.picturestorebackend.api.model.CreateOutPaintingTaskRequest;
+import org.example.picturestorebackend.api.model.CreateOutPaintingTaskResponse;
 import org.example.picturestorebackend.model.dto.picture.*;
 import org.example.picturestorebackend.model.entity.Picture;
 import org.example.picturestorebackend.model.entity.User;
@@ -116,4 +118,11 @@ public interface PictureService extends IService<Picture> {
      * @param loginUser
      */
     void editPictureByBatch(PictureEditByBatchRequest pictureEditByBatchRequest, User loginUser);
+
+    /**
+     * 创建扩图任务
+     * @param createOutPaintingTaskRequest
+     * @return
+     */
+    CreateOutPaintingTaskResponse createPictureOutPaintingTask(CreatePictureOutPaintingTaskRequest createOutPaintingTaskRequest, User loginUser);
 }

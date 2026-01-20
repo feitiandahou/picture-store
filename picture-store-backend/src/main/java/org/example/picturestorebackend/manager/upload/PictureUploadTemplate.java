@@ -80,7 +80,7 @@ public abstract class PictureUploadTemplate {
             return buildResult(originalFilename,file, uploadPath, imageInfo);
         }catch (Exception e){
             log.error("文件读写或上传COS失败", e);
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "上传失败");
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, e.toString());
         } finally {
             //临时文件清理
             this.deleteTempFile(file);
