@@ -3,7 +3,6 @@ import { getLoginUserUsingGet } from '@/api/userController'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
-const USER_KEY = 'login_user'
 export const useLoginUserStore = defineStore('loginUser', () => {
   const loginUser = ref<any>({
     userName: '未登录',

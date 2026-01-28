@@ -4,32 +4,46 @@ import { useLoginUserStore } from './stores/userStore'
 
 let firstFetchLoginUser = true
 
-/**
- * 全局权限校验，每次切换页面时都会执行
- */
+// 定义无需登录即可访问的页面（白名单）
+const whiteList = ['/user/login', '/user/register']
+
 router.beforeEach(async (to, from, next) => {
   console.log('进入全局权限校验')
 
+  const toPath = to.path
+
+  // 如果是白名单页面，直接放行，不获取用户信息
+  if (whiteList.includes(toPath)) {
+    console.log('白名单页面，跳过校验')
+    next()
+    return
+  }
+
   const loginUserStore = useLoginUserStore()
   let loginUser = loginUserStore.loginUser
-  // 确保页面刷新时，首次加载时能等待后端返回用户信息后再校验权限
+
   if (firstFetchLoginUser) {
-    await loginUserStore.fetchLoginUser()
-    loginUser = loginUserStore.loginUser
-    firstFetchLoginUser = false
+    try {
+      await loginUserStore.fetchLoginUser()
+      loginUser = loginUserStore.loginUser
+      firstFetchLoginUser = false
+    } catch (error) {
+      console.error('获取用户信息失败:', error)
+      // 即使失败，也要继续，避免卡死
+    }
   }
+
   console.log('loginUser', loginUser)
 
-  const toUrl = to.fullPath
-  console.log('toUrl', toUrl)
-  // 自定义权限校验逻辑，比如管理员才能访问/admin开头的页面
-  if (toUrl.startsWith('/admin')) {
+  // 权限校验：仅对 /admin 生效
+  if (toPath.startsWith('/admin')) {
     if (!loginUser || loginUser.userRole !== 'admin') {
       console.log('没有权限')
       message.error('没有权限')
-      next(`/user/login?redirect=${to.fullPath}`)
+      next(`/user/login?redirect= $ {to.fullPath}`)
       return
     }
   }
+
   next()
 })

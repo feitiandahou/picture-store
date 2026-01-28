@@ -6,6 +6,7 @@ import VueCropper from 'vue-cropper'
 import 'vue-cropper/dist/index.css'
 import App from './App.vue'
 import router from './router'
+import '@/access.ts'
 
 const app = createApp(App)
 
