@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.picturestorebackend.constant.UserConstant;
 import org.example.picturestorebackend.exception.BusinessException;
 import org.example.picturestorebackend.exception.ErrorCode;
+import org.example.picturestorebackend.manager.auth.StpKit;
 import org.example.picturestorebackend.model.dto.user.UserQueryRequest;
 import org.example.picturestorebackend.model.entity.User;
 import org.example.picturestorebackend.model.enums.UserRoleEnum;
@@ -94,6 +95,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         //4.保存用户的登录态
         request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
+        // 记录用户登录态到 Sa-token，便于空间鉴权时使用，注意保证该用户信息与 SpringSession 中的信息过期时间一致
+        StpKit.SPACE.login(user.getId());
+        StpKit.SPACE.getSession().set(UserConstant.USER_LOGIN_STATE, user);
         return this.getLoginUserVO(user);
     }
 
